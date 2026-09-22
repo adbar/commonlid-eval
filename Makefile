@@ -14,6 +14,7 @@ PACKAGE := src/commonlid
 
 .PHONY: help venv \
         install install-all install-afrolid install-commonlingua install-notebooks install-leaderboard \
+        install-google-translate \
         lint format format-check typecheck \
         test test-slow test-all check \
         build clean \
@@ -22,11 +23,12 @@ PACKAGE := src/commonlid
 help:
 	@echo "Targets:"
 	@echo "  venv                  Create a uv-managed virtualenv (.venv)"
-	@echo "  install               Sync runtime + dev extras (lint/type/test)"
+	@echo "  install               Sync runtime deps + the dev group (lint/type/test)"
 	@echo "  install-afrolid       install + the heavy [afrolid] extra (torch + transformers)"
 	@echo "  install-commonlingua  install + the [commonlingua] extra (torch only)"
 	@echo "  install-notebooks     install + the [notebooks] extra (jupyterlab + matplotlib)"
 	@echo "  install-leaderboard   install + the [leaderboard] extra (gradio)"
+	@echo "  install-google-translate  install + the [google-translate] extra (Cloud Translation client)"
 	@echo "  install-all           install + every optional extra"
 	@echo ""
 	@echo "  lint                  ruff check"
@@ -51,22 +53,25 @@ venv:
 	uv venv $(PYTHON_FLAG)
 
 install:
-	uv sync --extra dev $(PYTHON_FLAG)
+	uv sync $(PYTHON_FLAG)
 
 install-afrolid:
-	uv sync --extra dev --extra afrolid $(PYTHON_FLAG)
+	uv sync --extra afrolid $(PYTHON_FLAG)
 
 install-commonlingua:
-	uv sync --extra dev --extra commonlingua $(PYTHON_FLAG)
+	uv sync --extra commonlingua $(PYTHON_FLAG)
 
 install-notebooks:
-	uv sync --extra dev --extra notebooks $(PYTHON_FLAG)
+	uv sync --extra notebooks $(PYTHON_FLAG)
 
 install-leaderboard:
-	uv sync --extra dev --extra leaderboard $(PYTHON_FLAG)
+	uv sync --extra leaderboard $(PYTHON_FLAG)
+
+install-google-translate:
+	uv sync --extra google-translate $(PYTHON_FLAG)
 
 install-all:
-	uv sync --extra dev --extra afrolid --extra commonlingua --extra notebooks --extra leaderboard $(PYTHON_FLAG)
+	uv sync --all-extras $(PYTHON_FLAG)
 
 lint:
 	uv run ruff check $(SRC_DIRS)

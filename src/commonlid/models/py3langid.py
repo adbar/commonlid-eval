@@ -9,7 +9,9 @@ from commonlid.core.registry import register_model
 
 # codes the generic 639-1 -> 639-3 conformation would not reach
 _OUT_MAP = {"ar": "arb", "sw": "swh", "az": "azj", "or": "ory", "bcl": "bik"}
-_MIN_CONFIDENCE = 0.25  # best micro+macro F1 on commonlid
+# Tuned on commonlid, so treat the scores as optimistic. Measured effect:
+# no threshold 60.55 macro / 86.46 micro F1, 0.25 gives 64.81 / 86.85.
+_MIN_CONFIDENCE = 0.25
 
 
 @register_model
@@ -18,7 +20,11 @@ class Py3LangIDModel(LIDModel):
     requires_preprocessing = False
 
     def load(self) -> None:
-        from py3langid.langid import MODEL_FILE, LanguageIdentifier
+        try:
+            from py3langid.langid import MODEL_FILE, LanguageIdentifier
+        except ImportError as exc:
+            msg = "py3langid is not installed. Install with: pip install 'commonlid[py3langid]'"
+            raise ImportError(msg) from exc
 
         self._identifier = LanguageIdentifier.from_model_file(
             MODEL_FILE, norm_probs=True, min_confidence=_MIN_CONFIDENCE
